@@ -2,7 +2,10 @@ import { View, Text, Linking, StyleSheet, TouchableOpacity, Alert, ActivityIndic
 import React, { useEffect, useRef, useState } from 'react'
 import { styles } from './Style'
 import Entypo from 'react-native-vector-icons/Entypo'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import { useCameraDevice, useCameraPermission, Camera, PhotoFile } from 'react-native-vision-camera'
+import { Badge } from 'react-native-paper'
+import { stat } from 'react-native-fs'
 
 
 
@@ -11,7 +14,6 @@ import { useCameraDevice, useCameraPermission, Camera, PhotoFile } from 'react-n
 
 const ImageUploader = ({ navigation }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false)
-
   const { hasPermission, requestPermission } = useCameraPermission()
   requestPermission()
   const [TakenPhotos, setTakenPhotos] = useState([])
@@ -24,12 +26,11 @@ const ImageUploader = ({ navigation }) => {
   const handleShutter = async () => {
     setIsShutterLoading(true)
     const photo = await camera.current.takePhoto()
-
+     const statResult=await stat(`file://${photo.path}`)
+     console.log(statResult);
     setTakenPhotos([...TakenPhotos, photo.path])
     setIsShutterLoading(false)
   }
-  console.log(TakenPhotos);
-
 
   const handleCameraButton = async () => {
 
@@ -42,6 +43,12 @@ const ImageUploader = ({ navigation }) => {
     else {
       setIsCameraOpen(true)
     }
+  }
+
+  const handleDeleteImage = (index) => {
+    const newItems = [...TakenPhotos]; // Create a copy of the array
+    newItems.splice(index, 1); // Remove the item
+    setTakenPhotos(newItems);
   }
 
   return (
@@ -61,6 +68,10 @@ const ImageUploader = ({ navigation }) => {
           <TouchableOpacity onPress={() => setIsCameraOpen(false)} style={styles.backButton} >
             <Entypo name='chevron-left' color='white' size={40} />
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => setIsCameraOpen(false)} style={styles.galleryIcon} >
+            <Badge>{TakenPhotos.length}</Badge>
+            <Entypo name='images' color='white' size={40} />
+          </TouchableOpacity>
           {isShutterLoading ?
             <ActivityIndicator color={'orange'} size={70} style={styles.shutterButton} />
             :
@@ -69,41 +80,44 @@ const ImageUploader = ({ navigation }) => {
             </TouchableOpacity>}
         </>
         :
-        <>
-         
+        <View>
+
+          <Text style={styles.mainHeading}>ImageUploader</Text>
+          <TouchableOpacity style={styles.cameraButton} onPress={() => handleCameraButton()} >
+            <Entypo name='camera' size={50} />
+          </TouchableOpacity>
+
           <FlatList
-          ListHeaderComponent={
-           <>
-              <Text style={styles.mainHeading}>ImageUploader</Text>
-              <TouchableOpacity style={styles.cameraButton} onPress={() => handleCameraButton()} >
-                <Entypo name='camera' size={50} />
-              </TouchableOpacity>
-           </>
+            ListHeaderComponent={<View style={styles.itemSeparatorComponent}></View>}
+            ListFooterComponent={<View style={styles.itemSeparatorComponent}></View>}
+            ItemSeparatorComponent={<View style={styles.itemSeparatorComponent}></View>}
+            horizontal={true}
+            ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Images!</Text>}
+            data={TakenPhotos}
+            renderItem={({ index, item }) =>
+              <View>
+                <TouchableOpacity onPress={() => handleDeleteImage(index)} style={styles.imageDeleteCloseButton}>
+                  <AntDesign name='closecircle' size={30} color={'red'} />
+                </TouchableOpacity>
+                <Image source={{ uri: `file://${item}` }}
+                  style={styles.takenImageStyle}
+                />
+              </View>
+
+            }
+
+          />
+          {TakenPhotos.length > 0 && TakenPhotos.length <= 6 ?
+
+            <TouchableOpacity style={styles.uploadButton}>
+              <AntDesign name='cloudupload' size={50} color={'green'} />
+            </TouchableOpacity>
+            : TakenPhotos.length > 6 &&
+            <Text style={styles.only6PicsText}>You can upload only 6 pictures</Text>
 
           }
-          ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Images!</Text>}
-          data={TakenPhotos}
-          renderItem={({item})=>
-            
-              <Image source={{
-                uri: `file://${item}`}}
-                style={styles.takenImageStyle}
-                />
-          
-          }
-          
-          />
-          {/* {TakenPhotos.length > 0 ?
-            <Image source={{
-              uri: `file://${TakenPhotos[0]}`}}
-              style={styles.takenImageStyle}
-              />
-            :
-            <Text>
-              No images
-            </Text>
-          } */}
-        </>
+
+        </View>
       }
     </View>
   )
