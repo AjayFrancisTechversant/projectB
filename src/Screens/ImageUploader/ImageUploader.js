@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { styles } from './Style'
 import Entypo from 'react-native-vector-icons/Entypo'
 import AntDesign from 'react-native-vector-icons/AntDesign'
+import  MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useCameraDevice, useCameraPermission, Camera, PhotoFile } from 'react-native-vision-camera'
 import { Badge } from 'react-native-paper'
 import { stat } from 'react-native-fs'
@@ -26,8 +27,8 @@ const ImageUploader = ({ navigation }) => {
   const handleShutter = async () => {
     setIsShutterLoading(true)
     const photo = await camera.current.takePhoto()
-     const statResult=await stat(`file://${photo.path}`)
-     console.log(statResult);
+    const statResult = await stat(`file://${photo.path}`)
+    console.log(statResult);
     setTakenPhotos([...TakenPhotos, photo.path])
     setIsShutterLoading(false)
   }
@@ -50,7 +51,15 @@ const ImageUploader = ({ navigation }) => {
     newItems.splice(index, 1); // Remove the item
     setTakenPhotos(newItems);
   }
+  const compressTakenPhotos=()=>{
+    TakenPhotos.map(path=>(
+      console.log(path)
+    ))
+  }
 
+  const handleUpload=()=>{
+compressTakenPhotos()
+  }
   return (
     <View style={styles.canvas}>
       {isCameraOpen ?
@@ -84,15 +93,14 @@ const ImageUploader = ({ navigation }) => {
 
           <Text style={styles.mainHeading}>ImageUploader</Text>
           <TouchableOpacity style={styles.cameraButton} onPress={() => handleCameraButton()} >
-            <Entypo name='camera' size={50} />
+            <MaterialCommunityIcons name='camera-plus' size={50} />
           </TouchableOpacity>
-
           <FlatList
             ListHeaderComponent={<View style={styles.itemSeparatorComponent}></View>}
             ListFooterComponent={<View style={styles.itemSeparatorComponent}></View>}
             ItemSeparatorComponent={<View style={styles.itemSeparatorComponent}></View>}
             horizontal={true}
-            ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Images!</Text>}
+            ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Images Clicked!</Text>}
             data={TakenPhotos}
             renderItem={({ index, item }) =>
               <View>
@@ -109,12 +117,16 @@ const ImageUploader = ({ navigation }) => {
           />
           {TakenPhotos.length > 0 && TakenPhotos.length <= 6 ?
 
-            <TouchableOpacity style={styles.uploadButton}>
+            <TouchableOpacity onPress={handleUpload} style={styles.uploadButton}>
               <AntDesign name='cloudupload' size={50} color={'green'} />
             </TouchableOpacity>
             : TakenPhotos.length > 6 &&
-            <Text style={styles.only6PicsText}>You can upload only 6 pictures</Text>
-
+            <View>
+              <TouchableOpacity disabled style={styles.uploadButton}>
+                <AntDesign name='cloudupload' size={50} color={'green'} />
+              </TouchableOpacity>
+              <Text style={styles.only6PicsText}>You can upload only 6 pictures</Text>
+            </View>
           }
 
         </View>
