@@ -13,6 +13,7 @@ export const styles = StyleSheet.create({
     itemSeparatorComponent:{width:20},
     galleryIcon:{position:'absolute',bottom:30,left:40},
     imageDeleteCloseButton:{zIndex:1, position:'absolute',top:3,right:3},
-    uploadButton:{alignSelf:'center'},
-    only6PicsText:{alignSelf:'center',margin:10,color:'red'}
+    uploadButton:{alignSelf:'center',marginTop:20},
+    only6PicsText:{alignSelf:'center',margin:10,color:'red'},
+    
 });

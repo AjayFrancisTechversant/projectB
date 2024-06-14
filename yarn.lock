@@ -1643,6 +1643,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@bam.tech/react-native-image-resizer@npm:^3.0.10":
+  version: 3.0.10
+  resolution: "@bam.tech/react-native-image-resizer@npm:3.0.10"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 34cb129d421939ae2937f876986088a5ff25480a008f17c17651bae16e8a4a87882f0803137221d3e28423f343e77008cfb10062bf171db1bc230678b57d865e
+  languageName: node
+  linkType: hard
+
 "@bcoe/v8-coverage@npm:^0.2.3":
   version: 0.2.3
   resolution: "@bcoe/v8-coverage@npm:0.2.3"
@@ -7900,6 +7910,7 @@ __metadata:
     "@babel/core": ^7.20.0
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
+    "@bam.tech/react-native-image-resizer": ^3.0.10
     "@react-native-community/hooks": ^3.0.0
     "@react-native/babel-preset": 0.73.21
     "@react-native/eslint-config": 0.73.2
