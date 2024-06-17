@@ -4,9 +4,11 @@ import { styles } from './Style';
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useCameraDevice, useCameraPermission, Camera, PhotoFile } from 'react-native-vision-camera';
+import { useCameraDevice, useCameraPermission, Camera } from 'react-native-vision-camera';
 import { Badge } from 'react-native-paper';
 import ImageResizer from '@bam.tech/react-native-image-resizer';
+import storage from '@react-native-firebase/storage';
+import { utils } from '@react-native-firebase/app';
 
 const ImageUploader = ({ navigation }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -15,10 +17,13 @@ const ImageUploader = ({ navigation }) => {
   const [compressedPhotos, setCompressedPhotos] = useState([]);
   const [isShutterLoading, setIsShutterLoading] = useState(false);
   const [isUploadLoading, setIsUploadLoading] = useState(false);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
+  const [isFetchingImages, setIsFetchingImages] = useState(false);
   const camera = useRef(null);
 
   useEffect(() => {
     requestPermission();
+    fetchUploadedImages();
   }, []);
 
   const device = useCameraDevice('back');
@@ -30,7 +35,7 @@ const ImageUploader = ({ navigation }) => {
     setIsShutterLoading(true);
     try {
       const photo = await camera.current.takePhoto();
-      setTakenPhotos([...takenPhotos, photo.path]);
+      setTakenPhotos(prevPhotos => [...prevPhotos, photo.path]);
     } catch (error) {
       Alert.alert('Error taking photo', error.message);
     } finally {
@@ -50,10 +55,9 @@ const ImageUploader = ({ navigation }) => {
   };
 
   const handleDeleteImage = (index) => {
-    const newItems = [...takenPhotos];
-    newItems.splice(index, 1);
-    setTakenPhotos(newItems);
+    setTakenPhotos(prevPhotos => prevPhotos.filter((_, i) => i !== index));
   };
+
   const compressTakenPhotos = async () => {
     const compressed = await Promise.all(
       takenPhotos.map(async (photo) => {
@@ -66,15 +70,70 @@ const ImageUploader = ({ navigation }) => {
         }
       })
     );
-    setCompressedPhotos(compressed.filter(uri => uri !== null));
+    return compressed.filter(uri => uri !== null);
   };
 
-  const handleUploadButton = async() => {
-    setIsUploadLoading(true)
-    await compressTakenPhotos();
-    setIsUploadLoading(false)
+  const fetchExistingFiles = async () => {
+    const reference = storage().ref('Pics');
+    const result = await reference.listAll();
+    return result.items.map(item => item.fullPath);
   };
-console.log('compressed Photos=',compressedPhotos);
+
+  const deleteExtraFiles = async (existingFiles, currentFiles) => {
+    const currentFileNames = currentFiles.map((_, index) => `Pics/pic${index + 1}`);
+    const filesToDelete = existingFiles.filter(file => !currentFileNames.includes(file));
+    await Promise.all(filesToDelete.map(async (file) => {
+      const fileRef = storage().ref(file);
+      await fileRef.delete();
+    }));
+  };
+
+  const uploadFilesToCloud = async (currentFiles) => {
+    console.log('Uploading');
+    try {
+      const existingFiles = await fetchExistingFiles();
+      await deleteExtraFiles(existingFiles, currentFiles);
+      await Promise.all(
+        currentFiles.map(async (photo, index) => {
+          const reference = storage().ref(`Pics/pic${index + 1}`);
+          await reference.putFile(photo);
+        })
+      );
+    } catch (error) {
+      Alert.alert('Error uploading files', error.message);
+    }
+  };
+
+  const handleUploadButton = async () => {
+    setIsUploadLoading(true);
+    const compressed = await compressTakenPhotos();
+    setCompressedPhotos(compressed);
+    await uploadFilesToCloud(compressed);
+    await fetchUploadedImages();
+    setIsUploadLoading(false);
+    setTakenPhotos([])
+  };
+
+  const fetchUploadedImages = async () => {
+    setIsFetchingImages(true);
+    try {
+      const existingFiles = await fetchExistingFiles();
+      const urls = await Promise.all(existingFiles.map(async (filePath) => {
+        const url = await storage().ref(filePath).getDownloadURL();
+        return url;
+      }));
+      setUploadedImageUrls(urls);
+    } catch (error) {
+      Alert.alert('Error fetching uploaded images', error.message);
+    } finally {
+      setIsFetchingImages(false);
+    }
+  };
+
+  // console.log('compressed Photos=', compressedPhotos);
+  // console.log('taken Photos=', takenPhotos);
+  // console.log('uploaded Image URLs=', uploadedImageUrls);
+
   return (
     <View style={styles.canvas}>
       {isCameraOpen ? (
@@ -112,35 +171,55 @@ console.log('compressed Photos=',compressedPhotos);
             ListFooterComponent={<View style={styles.itemSeparatorComponent}></View>}
             ItemSeparatorComponent={<View style={styles.itemSeparatorComponent}></View>}
             horizontal={true}
-            ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Images</Text>}
+            ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Images in cache</Text>}
             data={takenPhotos}
             renderItem={({ index, item }) => (
               <View>
                 <TouchableOpacity onPress={() => handleDeleteImage(index)} style={styles.imageDeleteCloseButton}>
                   <AntDesign name='closecircle' size={30} color={'red'} />
                 </TouchableOpacity>
-                <Image source={{ uri: `file://${item}` }} style={styles.takenImageStyle} />
+                <Image source={{ uri: `file://${item}` }} style={styles.imageStyle} />
               </View>
             )}
           />
-          {isUploadLoading?<ActivityIndicator size={50} style={styles.uploadButton}/>
-            :
-          (takenPhotos.length > 0 && takenPhotos.length <= 6 
-          ? 
-          (
-            <TouchableOpacity onPress={handleUploadButton} style={styles.uploadButton}>
-              <AntDesign name='cloudupload' size={50} color={'green'} />
-            </TouchableOpacity>
-          )
-          : takenPhotos.length > 6 ? (
-            <View>
-              <TouchableOpacity disabled style={styles.uploadButton}>
+          {isUploadLoading ? (
+            <ActivityIndicator size={50} style={styles.uploadButton} />
+          ) : (
+            takenPhotos.length > 0 && takenPhotos.length <= 6 ? (
+              <TouchableOpacity onPress={handleUploadButton} style={styles.uploadButton}>
                 <AntDesign name='cloudupload' size={50} color={'green'} />
               </TouchableOpacity>
-              <Text style={styles.only6PicsText}>You can upload only 6 pictures</Text>
-            </View>
-          ) : null)}
-            
+            ) : takenPhotos.length > 6 ? (
+              <View>
+                <TouchableOpacity disabled style={styles.uploadButton}>
+                  <AntDesign name='cloudupload' size={50} color={'green'} />
+                </TouchableOpacity>
+                <Text style={styles.only6PicsText}>You can upload only 6 pictures</Text>
+              </View>
+            ) : null
+          )}
+          <Text style={styles.mainHeading}>Uploaded Images</Text>
+          {isFetchingImages ? (
+            <ActivityIndicator size={50} />
+          ) : (
+            <FlatList
+              ListHeaderComponent={<View style={styles.itemSeparatorComponent}></View>}
+              ListFooterComponent={<View style={styles.itemSeparatorComponent}></View>}
+              ItemSeparatorComponent={<View style={styles.itemSeparatorComponent}></View>}
+              horizontal={true}
+              ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Uploaded Images</Text>}
+              data={uploadedImageUrls}
+              renderItem={({ item }) => (
+                <View>
+                  
+                  <Image source={{ uri: item }} style={styles.imageStyle} />
+                  
+                  </View>
+               
+              )}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          )}
         </ScrollView>
       )}
     </View>

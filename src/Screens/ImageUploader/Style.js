@@ -9,11 +9,14 @@ export const styles = StyleSheet.create({
     shutterButton:{position:'absolute',bottom:20,alignSelf:'center'},
     backButton:{position:'absolute',top:10,left:10},
     emptyComponentStyle:{ alignSelf:'center',fontSize:30,color:'orange'},
-    takenImageStyle:{height:200,width:200},
+    imageStyle:{height:200,width:200,borderRadius:5},
     itemSeparatorComponent:{width:20},
     galleryIcon:{position:'absolute',bottom:30,left:40},
     imageDeleteCloseButton:{zIndex:1, position:'absolute',top:3,right:3},
     uploadButton:{alignSelf:'center',marginTop:20},
     only6PicsText:{alignSelf:'center',margin:10,color:'red'},
-    
+    lineBreak:{alignSelf:'center'},
+    uploadedImagesContainer:{
+    },
+    subHeading:{alignSelf:'center',fontSize:30}
 });
