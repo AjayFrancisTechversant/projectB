@@ -18,6 +18,8 @@ const ImageUploader = ({ navigation }) => {
   const [isUploadLoading, setIsUploadLoading] = useState(false);
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [isFetchingImages, setIsFetchingImages] = useState(false);
+  const [isFlashOn, setIsFlashOn] = useState(false)
+  const [isTorchOn,setIsTorchOn]=useState(false)
   const camera = useRef(null);
 
   useEffect(() => {
@@ -33,7 +35,9 @@ const ImageUploader = ({ navigation }) => {
   const handleShutter = async () => {
     setIsShutterLoading(true);
     try {
-      const photo = await camera.current.takePhoto();
+      const photo = await camera.current.takePhoto({
+        flash:isFlashOn?'on':'off'
+      });
       setTakenPhotos(prevPhotos => [...prevPhotos, photo.path]);
     } catch (error) {
       Alert.alert('Error taking photo', error.message);
@@ -88,7 +92,6 @@ const ImageUploader = ({ navigation }) => {
   };
 
   const uploadFilesToCloud = async (currentFiles) => {
-    console.log('Uploading');
     try {
       const existingFiles = await fetchExistingFiles();
       await deleteExtraFiles(existingFiles, currentFiles);
@@ -158,6 +161,7 @@ const ImageUploader = ({ navigation }) => {
       {isCameraOpen ? (
         <>
           <Camera
+            torch={isTorchOn?'on':'off'}
             ref={camera}
             style={StyleSheet.absoluteFill}
             device={device}
@@ -170,6 +174,12 @@ const ImageUploader = ({ navigation }) => {
           <TouchableOpacity onPress={() => setIsCameraOpen(false)} style={styles.galleryIcon}>
             <Badge>{takenPhotos.length}</Badge>
             <Entypo name='images' color='white' size={40} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setIsFlashOn(!isFlashOn)} style={styles.flashIcon}>
+            <MaterialCommunityIcons name={!isFlashOn?'flash-off':'flash'} color='white' size={40} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setIsTorchOn(!isTorchOn)} style={styles.torchIcon}>
+            <MaterialCommunityIcons name={!isTorchOn?'flashlight-off':'flashlight'} color='white' size={40} />
           </TouchableOpacity>
           {isShutterLoading ? (
             <ActivityIndicator color={'orange'} size={70} style={styles.shutterButton} />

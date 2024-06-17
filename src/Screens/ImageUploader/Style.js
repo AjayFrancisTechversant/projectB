@@ -18,5 +18,7 @@ export const styles = StyleSheet.create({
     lineBreak:{alignSelf:'center'},
     uploadedImagesContainer:{
     },
-    subHeading:{alignSelf:'center',fontSize:30}
+    subHeading:{alignSelf:'center',fontSize:30},
+    flashIcon:{position:'absolute',right:10,top:10},
+    torchIcon:{position:'absolute',right:10,top:100},
 });
