@@ -129,6 +129,26 @@ const ImageUploader = ({ navigation }) => {
       setIsFetchingImages(false);
     }
   };
+  const handleDeleteUploadedImage = async (index) => {
+    try {
+      const existingFiles = await fetchExistingFiles();
+      console.log('existingFiles', existingFiles);
+
+      try {
+        const deleteFileRef = storage().ref(existingFiles[index])
+        await deleteFileRef.delete()
+        fetchUploadedImages();
+      } catch (error) {
+        console.log(error);
+      }
+
+
+      // console.log(uploadedImageUrls);
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
 
   // console.log('compressed Photos=', compressedPhotos);
   // console.log('taken Photos=', takenPhotos);
@@ -209,13 +229,15 @@ const ImageUploader = ({ navigation }) => {
               horizontal={true}
               ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Uploaded Images</Text>}
               data={uploadedImageUrls}
-              renderItem={({ item }) => (
+              renderItem={({ item, index }) => (
                 <View>
-                  
+                  <TouchableOpacity onPress={() => handleDeleteUploadedImage(index)} style={styles.imageDeleteCloseButton}>
+                    <AntDesign name='closecircle' size={30} color={'red'} />
+                  </TouchableOpacity>
                   <Image source={{ uri: item }} style={styles.imageStyle} />
-                  
-                  </View>
-               
+
+                </View>
+
               )}
               keyExtractor={(item, index) => index.toString()}
             />
