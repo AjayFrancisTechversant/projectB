@@ -8,7 +8,6 @@ import { useCameraDevice, useCameraPermission, Camera } from 'react-native-visio
 import { Badge } from 'react-native-paper';
 import ImageResizer from '@bam.tech/react-native-image-resizer';
 import storage from '@react-native-firebase/storage';
-import { utils } from '@react-native-firebase/app';
 
 const ImageUploader = ({ navigation }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -132,9 +131,9 @@ const ImageUploader = ({ navigation }) => {
   const handleDeleteUploadedImage = async (index) => {
     try {
       const existingFiles = await fetchExistingFiles();
-      console.log('existingFiles', existingFiles);
 
       try {
+        setIsFetchingImages(true);
         const deleteFileRef = storage().ref(existingFiles[index])
         await deleteFileRef.delete()
         fetchUploadedImages();
