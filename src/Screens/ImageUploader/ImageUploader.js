@@ -182,7 +182,7 @@ const ImageUploader = ({ navigation }) => {
             <MaterialCommunityIcons name={!isTorchOn?'flashlight-off':'flashlight'} color='white' size={40} />
           </TouchableOpacity>
           {isShutterLoading ? (
-            <ActivityIndicator color={'orange'} size={70} style={styles.shutterButton} />
+            <ActivityIndicator color={'white'} size={70} style={styles.shutterButton} />
           ) : (
             <TouchableOpacity onPress={handleShutter} style={styles.shutterButton}>
               <Entypo name='circle' color='white' size={70} />
@@ -191,10 +191,13 @@ const ImageUploader = ({ navigation }) => {
         </>
       ) : (
         <ScrollView>
-          <Text style={styles.mainHeading}>ImageUploader</Text>
-          <TouchableOpacity style={styles.cameraButton} onPress={handleCameraButton}>
-            <MaterialCommunityIcons name='camera-plus' size={50} />
-          </TouchableOpacity>
+          <Text style={styles.mainHeading}>Image Upload</Text>
+         <View style={styles.dashedBorder}>
+            <TouchableOpacity style={styles.cameraButton} onPress={handleCameraButton}>
+              <MaterialCommunityIcons name='camera-plus' size={50} />
+            </TouchableOpacity>
+            <Text>Click to Capture Images</Text>
+         </View>
           <FlatList
             ListHeaderComponent={<View style={styles.itemSeparatorComponent}></View>}
             ListFooterComponent={<View style={styles.itemSeparatorComponent}></View>}
@@ -203,7 +206,7 @@ const ImageUploader = ({ navigation }) => {
             ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Images in cache</Text>}
             data={takenPhotos}
             renderItem={({ index, item }) => (
-              <View>
+              <View style={styles.cardView}>
                 <TouchableOpacity onPress={() => handleDeleteImage(index)} style={styles.imageDeleteCloseButton}>
                   <AntDesign name='closecircle' size={30} color={'red'} />
                 </TouchableOpacity>
@@ -212,7 +215,7 @@ const ImageUploader = ({ navigation }) => {
             )}
           />
           {isUploadLoading ? (
-            <ActivityIndicator size={50} style={styles.uploadButton} />
+            <ActivityIndicator size={40} style={styles.uploadButton} />
           ) : (
             takenPhotos.length > 0 && takenPhotos.length <= 6 ? (
               <TouchableOpacity onPress={handleUploadButton} style={styles.uploadButton}>
@@ -221,15 +224,15 @@ const ImageUploader = ({ navigation }) => {
             ) : takenPhotos.length > 6 ? (
               <View>
                 <TouchableOpacity disabled style={styles.uploadButton}>
-                  <AntDesign name='cloudupload' size={50} color={'green'} />
+                  <AntDesign name='cloudupload' size={50} color={'green'}/>
                 </TouchableOpacity>
                 <Text style={styles.only6PicsText}>You can upload only 6 pictures</Text>
               </View>
             ) : null
           )}
-          <Text style={styles.mainHeading}>Uploaded Images</Text>
+          <Text style={styles.subHeading}>Uploaded Images:</Text>
           {isFetchingImages ? (
-            <ActivityIndicator size={50} />
+            <ActivityIndicator size={40} color={'grey'} />
           ) : (
             <FlatList
               ListHeaderComponent={<View style={styles.itemSeparatorComponent}></View>}
@@ -239,7 +242,7 @@ const ImageUploader = ({ navigation }) => {
               ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Uploaded Images</Text>}
               data={uploadedImageUrls}
               renderItem={({ item, index }) => (
-                <View>
+                <View style={styles.cardView}>
                   <TouchableOpacity onPress={() => handleDeleteUploadedImage(index)} style={styles.imageDeleteCloseButton}>
                     <AntDesign name='closecircle' size={30} color={'red'} />
                   </TouchableOpacity>
