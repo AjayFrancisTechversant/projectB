@@ -4,10 +4,11 @@ import { styles } from './Style';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useCameraDevice, useCameraPermission, Camera } from 'react-native-vision-camera';
+import {  useCameraPermission,  } from 'react-native-vision-camera';
 import ImageResizer from '@bam.tech/react-native-image-resizer';
 import storage from '@react-native-firebase/storage';
 import CameraScreen from '../../Components/CameraScreen/CameraScreen';
+import CardA from '../../Components/CardA/CardA';
 
 const ImageUploader = ({ navigation }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -20,7 +21,6 @@ const ImageUploader = ({ navigation }) => {
   const [isFetchingImages, setIsFetchingImages] = useState(false);
   const [isFlashOn, setIsFlashOn] = useState(false)
   const camera = useRef(null);
-  
   
 
   useEffect(() => {
@@ -176,12 +176,10 @@ const ImageUploader = ({ navigation }) => {
             ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Images in cache</Text>}
             data={takenPhotos}
             renderItem={({ index, item }) => (
-              <View style={styles.cardView}>
-                <TouchableOpacity onPress={() => handleDeleteImage(index)} style={styles.imageDeleteCloseButton}>
-                  <AntDesign name='closecircle' size={30} color={'red'} />
-                </TouchableOpacity>
-                <Image source={{ uri: `file://${item}` }} style={styles.imageStyle} />
-              </View>
+            
+              <CardA item={item} index={index} onPressDeletefn={handleDeleteImage}
+              componentlocation={'cacheImagesDisplay'}
+              />
             )}
           />
           {isUploadLoading ? (
@@ -212,13 +210,8 @@ const ImageUploader = ({ navigation }) => {
               ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Uploaded Images</Text>}
               data={uploadedImageUrls}
               renderItem={({ item, index }) => (
-                <View style={styles.cardView}>
-                  <TouchableOpacity onPress={() => handleDeleteUploadedImage(index)} style={styles.imageDeleteCloseButton}>
-                    <AntDesign name='closecircle' size={30} color={'red'} />
-                  </TouchableOpacity>
-                  <Image source={{ uri: item }} style={styles.imageStyle} />
-
-                </View>
+              
+                <CardA item={item} index={index} onPressDeletefn={handleDeleteUploadedImage}/>
 
               )}
               keyExtractor={(item, index) => index.toString()}

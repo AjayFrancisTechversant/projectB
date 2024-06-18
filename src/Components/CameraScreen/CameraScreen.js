@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
-import React, { useRef, useState } from 'react'
+import { View,  TouchableOpacity, ActivityIndicator } from 'react-native'
+import React, {  useState } from 'react'
 import { styles } from './Style'
-import { useCameraDevice, useCameraPermission, Camera } from 'react-native-vision-camera';
+import { useCameraDevice,  Camera } from 'react-native-vision-camera';
 import { Badge } from 'react-native-paper';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
