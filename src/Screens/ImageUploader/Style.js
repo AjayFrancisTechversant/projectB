@@ -6,9 +6,9 @@ export const styles = StyleSheet.create({
         fontSize: 30, marginVertical: 10, marginLeft: 10, fontWeight: "bold"
     },
     subHeading: {fontSize: 20, marginVertical: 10, marginLeft: 10,fontWeight:'bold'},
-    dashedBorder: { borderWidth: 1, width: 300, height: 150, alignSelf: 'center', borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderStyle: 'dashed', borderColor: 'grey' },
+    dashedBorder: { borderWidth: 1, width: 300, height: 150, alignSelf: 'center', borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderStyle: 'dashed', borderColor: 'grey' ,marginBottom:10},
     cameraButton: { marginBottom: 20, },
-    emptyComponentStyle: { alignSelf: 'center', fontSize: 14, marginLeft: 30, marginTop: 10 },
+    emptyComponentStyle: { alignSelf: 'center', fontSize: 14, marginLeft: 30,  },
     
     itemSeparatorComponent: { width: 20 },
     

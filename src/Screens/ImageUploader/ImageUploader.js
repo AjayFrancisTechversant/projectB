@@ -173,7 +173,7 @@ const ImageUploader = ({ navigation }) => {
             ListFooterComponent={<View style={styles.itemSeparatorComponent}></View>}
             ItemSeparatorComponent={<View style={styles.itemSeparatorComponent}></View>}
             horizontal={true}
-            ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Images in cache</Text>}
+            // ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Images in cache</Text>}
             data={takenPhotos}
             renderItem={({ index, item }) => (
             
