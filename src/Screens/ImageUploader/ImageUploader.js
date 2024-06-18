@@ -4,7 +4,7 @@ import { styles } from './Style';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {  useCameraPermission,  } from 'react-native-vision-camera';
+import { useCameraPermission, } from 'react-native-vision-camera';
 import ImageResizer from '@bam.tech/react-native-image-resizer';
 import storage from '@react-native-firebase/storage';
 import CameraScreen from '../../Components/CameraScreen/CameraScreen';
@@ -21,20 +21,20 @@ const ImageUploader = ({ navigation }) => {
   const [isFetchingImages, setIsFetchingImages] = useState(false);
   const [isFlashOn, setIsFlashOn] = useState(false)
   const camera = useRef(null);
-  
+
 
   useEffect(() => {
     requestPermission();
     fetchUploadedImages();
   }, []);
 
- 
+
 
   const handleShutter = async () => {
     setIsShutterLoading(true);
     try {
       const photo = await camera.current.takePhoto({
-        flash:isFlashOn?'on':'off'
+        flash: isFlashOn ? 'on' : 'off'
       });
       setTakenPhotos(prevPhotos => [...prevPhotos, photo.path]);
     } catch (error) {
@@ -155,20 +155,21 @@ const ImageUploader = ({ navigation }) => {
   return (
     <View style={styles.canvas}>
       {isCameraOpen ? (
-        <CameraScreen takenPhotos={takenPhotos} isFlashOn={isFlashOn} 
-        setIsFlashOn={setIsFlashOn} isShutterLoading={isShutterLoading}
-        handleShutter={handleShutter} camera={camera} setIsCameraOpen={setIsCameraOpen}
+        <CameraScreen takenPhotos={takenPhotos} isFlashOn={isFlashOn}
+          setIsFlashOn={setIsFlashOn} isShutterLoading={isShutterLoading}
+          handleShutter={handleShutter} camera={camera} setIsCameraOpen={setIsCameraOpen}
         />
       ) : (
         <ScrollView>
           <Text style={styles.mainHeading}>Image Upload</Text>
-         <View style={styles.dashedBorder}>
+          <View style={styles.dashedBorder}>
             <TouchableOpacity style={styles.cameraButton} onPress={handleCameraButton}>
               <MaterialCommunityIcons name='camera-plus' size={50} />
             </TouchableOpacity>
             <Text>Click to Capture Images</Text>
-         </View>
+          </View>
           <FlatList
+            showsHorizontalScrollIndicator={false}
             ListHeaderComponent={<View style={styles.itemSeparatorComponent}></View>}
             ListFooterComponent={<View style={styles.itemSeparatorComponent}></View>}
             ItemSeparatorComponent={<View style={styles.itemSeparatorComponent}></View>}
@@ -176,9 +177,9 @@ const ImageUploader = ({ navigation }) => {
             // ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Images in cache</Text>}
             data={takenPhotos}
             renderItem={({ index, item }) => (
-            
+
               <CardA item={item} index={index} onPressDeletefn={handleDeleteImage}
-              componentlocation={'cacheImagesDisplay'}
+                componentlocation={'cacheImagesDisplay'}
               />
             )}
           />
@@ -192,7 +193,7 @@ const ImageUploader = ({ navigation }) => {
             ) : takenPhotos.length > 6 ? (
               <View>
                 <TouchableOpacity disabled style={styles.uploadButton}>
-                  <AntDesign name='cloudupload' size={50} color={'green'}/>
+                  <AntDesign name='cloudupload' size={50} color={'green'} />
                 </TouchableOpacity>
                 <Text style={styles.only6PicsText}>You can upload only 6 pictures</Text>
               </View>
@@ -203,6 +204,7 @@ const ImageUploader = ({ navigation }) => {
             <ActivityIndicator size={40} color={'grey'} />
           ) : (
             <FlatList
+              showsHorizontalScrollIndicator={false}
               ListHeaderComponent={<View style={styles.itemSeparatorComponent}></View>}
               ListFooterComponent={<View style={styles.itemSeparatorComponent}></View>}
               ItemSeparatorComponent={<View style={styles.itemSeparatorComponent}></View>}
@@ -210,8 +212,8 @@ const ImageUploader = ({ navigation }) => {
               ListEmptyComponent={<Text style={styles.emptyComponentStyle}>No Uploaded Images</Text>}
               data={uploadedImageUrls}
               renderItem={({ item, index }) => (
-              
-                <CardA item={item} index={index} onPressDeletefn={handleDeleteUploadedImage}/>
+
+                <CardA item={item} index={index} onPressDeletefn={handleDeleteUploadedImage} />
 
               )}
               keyExtractor={(item, index) => index.toString()}
