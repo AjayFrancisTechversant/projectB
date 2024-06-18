@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
     canvas: { flex: 1, backgroundColor: 'white' },
     mainHeading: {
-        fontSize: 30, marginVertical: 10, marginLeft: 10, fontWeight: "bold"
+        fontSize: 40, marginVertical: 10, marginLeft: 10, fontWeight: "bold"
     },
     subHeading: {fontSize: 20, marginVertical: 10, marginLeft: 10,fontWeight:'bold'},
     dashedBorder: { borderWidth: 1, width: 300, height: 150, alignSelf: 'center', borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderStyle: 'dashed', borderColor: 'grey' },

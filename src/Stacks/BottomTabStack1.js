@@ -8,7 +8,7 @@ const BottomTabStack=createBottomTabNavigator()
 
 const BottomTabStack1 = () => {
   return (
-   <BottomTabStack.Navigator screenOptions={{headerShown:false}}>
+   <BottomTabStack.Navigator screenOptions={{headerShown:false,tabBarStyle:{height:50}}}>
     <BottomTabStack.Screen name='ImageUploader' component={ImageUploader} />
     <BottomTabStack.Screen name='Me' component={Me} />
 

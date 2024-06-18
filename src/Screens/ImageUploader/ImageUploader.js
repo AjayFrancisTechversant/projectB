@@ -1,13 +1,13 @@
 import { View, Text, Linking, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Image, FlatList, ScrollView } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { styles } from './Style';
-import Entypo from 'react-native-vector-icons/Entypo';
+
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useCameraDevice, useCameraPermission, Camera } from 'react-native-vision-camera';
-import { Badge } from 'react-native-paper';
 import ImageResizer from '@bam.tech/react-native-image-resizer';
 import storage from '@react-native-firebase/storage';
+import CameraScreen from '../../Components/CameraScreen/CameraScreen';
 
 const ImageUploader = ({ navigation }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -19,18 +19,16 @@ const ImageUploader = ({ navigation }) => {
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [isFetchingImages, setIsFetchingImages] = useState(false);
   const [isFlashOn, setIsFlashOn] = useState(false)
-  const [isTorchOn,setIsTorchOn]=useState(false)
   const camera = useRef(null);
+  
+  
 
   useEffect(() => {
     requestPermission();
     fetchUploadedImages();
   }, []);
 
-  const device = useCameraDevice('back');
-  if (device == null) {
-    Alert.alert('No camera device available');
-  }
+ 
 
   const handleShutter = async () => {
     setIsShutterLoading(true);
@@ -143,8 +141,6 @@ const ImageUploader = ({ navigation }) => {
       } catch (error) {
         console.log(error);
       }
-
-
       // console.log(uploadedImageUrls);
     } catch (error) {
       console.log(error);
@@ -159,36 +155,10 @@ const ImageUploader = ({ navigation }) => {
   return (
     <View style={styles.canvas}>
       {isCameraOpen ? (
-        <>
-          <Camera
-            torch={isTorchOn?'on':'off'}
-            ref={camera}
-            style={StyleSheet.absoluteFill}
-            device={device}
-            isActive={true}
-            photo={true}
-          />
-          <TouchableOpacity onPress={() => setIsCameraOpen(false)} style={styles.backButton}>
-            <Entypo name='chevron-left' color='white' size={40} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setIsCameraOpen(false)} style={styles.galleryIcon}>
-            <Badge>{takenPhotos.length}</Badge>
-            <Entypo name='images' color='white' size={40} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setIsFlashOn(!isFlashOn)} style={styles.flashIcon}>
-            <MaterialCommunityIcons name={!isFlashOn?'flash-off':'flash'} color='white' size={40} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setIsTorchOn(!isTorchOn)} style={styles.torchIcon}>
-            <MaterialCommunityIcons name={!isTorchOn?'flashlight-off':'flashlight'} color='white' size={40} />
-          </TouchableOpacity>
-          {isShutterLoading ? (
-            <ActivityIndicator color={'white'} size={70} style={styles.shutterButton} />
-          ) : (
-            <TouchableOpacity onPress={handleShutter} style={styles.shutterButton}>
-              <Entypo name='circle' color='white' size={70} />
-            </TouchableOpacity>
-          )}
-        </>
+        <CameraScreen takenPhotos={takenPhotos} isFlashOn={isFlashOn} 
+        setIsFlashOn={setIsFlashOn} isShutterLoading={isShutterLoading}
+        handleShutter={handleShutter} camera={camera} setIsCameraOpen={setIsCameraOpen}
+        />
       ) : (
         <ScrollView>
           <Text style={styles.mainHeading}>Image Upload</Text>
